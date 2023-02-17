@@ -1,0 +1,844 @@
+/* 共通事項 */
+
+body {
+    height: 100%;
+    width: 100%;
+    background-color: #F5F5F8;
+    user-select: none;
+}
+
+body.overflow-hidden {
+    overflow-y: hidden;
+}
+
+ul {
+    list-style-type: none;
+    margin-block-start: 0em;
+    margin-block-end: 0em;
+    padding-inline-start: 0px;
+}
+
+header {
+    align-items: center;
+    width: 100%;
+    height: 64px;
+    background-color: #FFFFFF;
+    z-index: 99;
+}
+
+html {
+    box-sizing: border-box;
+}
+
+html.overflow-hidden {
+    box-sizing: border-box;
+}
+
+main {
+    margin: 0 auto;
+}
+
+textarea[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+p {
+    font-weight: bold;
+}
+
+
+/* --------ヘッダー------------------------------- */
+
+.menu {
+    display: flex;
+    gap: 30px;
+    text-align: center;
+    align-items: center;
+    margin-left: 10px;
+}
+
+#open {
+    display: block;
+    padding: 12px;
+    background: linear-gradient(to right, #0f71DC, #3ccfff);
+    margin: 10px 5%;
+    border-radius: 50px;
+    max-width: 170px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 10px 10px 10px 0 rgba(60, 194, 235, 0.8);
+    color: #FFFFFF;
+    align-items: center;
+    cursor: pointer;
+    border: 1px solid #ccc;
+}
+
+#decide {
+    display: block;
+    padding: 12px;
+    background: linear-gradient(to right, #0f71DC, #3ccfff);
+    margin: 10px 5%;
+    border-radius: 50px;
+    max-width: 170px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 10px 10px 10px 0 rgba(60, 194, 235, 0.8);
+    color: #FFFFFF;
+    align-items: center;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    margin: 0 auto;
+    max-width: 150px;
+}
+
+#open2 {
+    display: none;
+    box-shadow: 10px 10px 10px 0 rgba(60, 194, 235, 0.8);
+    margin: 0 auto;
+    width: auto;
+    max-width: 570px;
+    padding: 12px;
+    background: linear-gradient(to right, #0f71DC, #3ccfff);
+    border-radius: 50px;
+    text-align: center;
+    color: #FFFFFF;
+    align-items: center;
+    cursor: pointer;
+    border: 1px solid #ccc;
+}
+
+.header-menu {
+    justify-content: space-between;
+    display: flex;
+}
+
+.header-menu-week {
+    color: #97b9d1;
+}
+
+
+/* 左側のところのやつら-------------------------------- */
+
+.log {
+    padding-top: 20px;
+    margin: 0 auto;
+    max-width: 1032px;
+    width: 100%;
+}
+
+.graphs {
+    display: grid;
+    gap: 20px;
+}
+
+.parameter {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    text-align: center;
+    max-width: 100%;
+    width: 100%;
+}
+
+.time {
+    max-width: 100%;
+}
+
+.todays,
+.month,
+.total {
+    padding: 10px 25px 10px 25px;
+    background-color: #FFFFFF;
+    margin: 10px;
+    box-shadow: 5px 5px 2px 0 #e2dede;
+    border-radius: 10px;
+}
+
+.range {
+    color: #0F71BC;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.parameter-time {
+    font-size: 30px;
+    font-weight: bold;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    gap: 4px;
+}
+
+.unit {
+    color: #97B9D1;
+    font-size: 14px;
+}
+
+
+/* -------------------右側の円グラフ-------------------- */
+
+.graph {
+    padding: 50px;
+    background-color: #FFFFFF;
+    margin-top: 15px;
+    border-radius: 20px;
+    box-shadow: 5px 5px 2px 0 #e2dede
+}
+
+.circle-graphs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.language {
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    box-shadow: 5px 5px 2px 0 #e2dede
+}
+
+.content {
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    box-shadow: 5px 5px 2px 0 #e2dede
+}
+
+.graph-title {
+    padding: 20px 0 0 15px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.date {
+    font-weight: bold;
+    font-size: 18px;
+    text-align: center;
+    padding-top: 20px;
+    padding-bottom: 30px;
+}
+
+@media screen and (max-width: 768px) {
+    .date {
+        padding-top: 10px;
+    }
+}
+
+.circle-graph {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+}
+
+
+/* --------------日程変更 下のやつ------------------------ */
+
+.date:before {
+    content: "\03c";
+    color: #0f71bc;
+}
+
+.date:after {
+    content: "\03e";
+    color: #97b9d1;
+}
+
+
+/*----------------------------- モーダル-------------- */
+
+#mask {
+    background: rgba(0, 0, 0, 0.4);
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    /* ↑マスクの領域が画面全体に広がる */
+    z-index: 1;
+}
+
+.modal-box {
+    overflow: hidden;
+}
+
+#modal {
+    background: #fff;
+    padding: 20px;
+    border-radius: 30px;
+    position: absolute;
+    left: 4em;
+    right: 4em;
+    margin: 0 auto;
+    justify-content: center;
+    z-index: 5;
+    width: auto;
+    max-width: 900px;
+    height: auto;
+    overflow-y: hidden;
+}
+
+#modal-content {
+    justify-content: space-between;
+    width: auto;
+    box-sizing: border-box;
+    width: 100%;
+    display: block;
+}
+
+@media screen and (max-width: 768px) {
+    #modal-content {
+        width: 100%;
+        border-radius: 30px 30px 0 0;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    #modal {
+        left: 0em;
+        right: 0em;
+        border-radius: 0;
+        margin-top: 8%;
+    }
+}
+
+#modal-otherthan-close {
+    justify-content: space-between;
+    width: auto;
+    box-sizing: border-box;
+}
+
+.modal-log-list {
+    padding: 0 56px;
+    display: grid;
+    width: auto;
+    width: 100%;
+    box-sizing: border-box;
+    height: 100%;
+}
+
+.modal-log-language>p {
+    margin-top: 24px;
+}
+
+#mask.hidden {
+    display: none;
+}
+
+#modal.hidden {
+    transform: translate(0, -2000px);
+    /* x軸、y軸それぞれどこにしまっておくか、-2000にすれば画面から消える */
+}
+
+#close {
+    font-size: 20px;
+    max-width: 40px;
+    cursor: pointer;
+    border-radius: 50%;
+    height: 40px;
+    width: 40px;
+    line-height: 40px;
+    text-align: center;
+    margin-left:  auto;
+    font-size: 30px;
+    background-color: #f5f5f8;
+    text-align: center;
+    line-height: 33px;
+}
+
+.share {
+    margin-top: 15px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.checkbox.log-title {
+    margin-top: 10px;
+}
+
+#posse-assignment {
+    display: inline-block;
+}
+
+.checkbox {
+    background-color: #F5F5F8;
+    max-width: 250px;
+    border-radius: 25px;
+    padding: 10px;
+    margin-top: 8px;
+    cursor: pointer;
+    position: relative;
+    gap: 5px;
+    padding: 5px 15px 5px 40px;
+}
+
+.padding-top {
+    margin-top: 10px;
+}
+
+.checkbox.checked {
+    background-color: #0F71BC
+}
+
+input[type=checkbox] {
+    display: none;
+}
+
+input[type=checkbox]:checked+label {
+    background: #E7F5FF;
+}
+
+input[type=checkbox]:checked+label::before {
+    background: #0f71bc;
+}
+
+input[name=twitter]:checked+label {
+    background: inherit;
+}
+
+.checkmark-true {
+    content: '';
+    width: 10px;
+    height: 5px;
+    border-left: 3px solid #FFFFFF;
+    border-bottom: 3px solid #FFFFFF;
+    transform: rotate(-45deg);
+    display: inline-block;
+    background-size: cover;
+    position: absolute;
+    z-index: 4142121;
+    display: inline-block;
+    left: 9px;
+    top: 13px;
+}
+
+.checkbox::before {
+    content: "";
+    background-color: #CCCCCC;
+    border-radius: 50%;
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 5px;
+    top: 6px;
+}
+
+
+/* カレンダーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー */
+
+.arrowmark {
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+    line-height: 50px;
+    text-align: center;
+    font-size: 30px;
+    background-color: #f5f5f8;
+    line-height: 33px;
+}
+
+#calendar {
+    display: none;
+    margin: 0 auto;
+    text-align: center;
+}
+
+#calendar.display_block {
+    display: table;
+}
+
+table {
+    border-collapse: collapse;
+    /* border: 2px solid #eee; */
+}
+
+
+/* thead,
+        tfoot {
+            background: #eee;
+        } */
+
+th,
+td {
+    padding: 8px;
+    text-align: center;
+    font-weight: bold;
+}
+
+tr>th {
+    font-size: 8px;
+}
+
+#title {
+    color: black;
+    font-size: 16px;
+}
+
+tfoot {
+    font-weight: bold;
+}
+
+td {
+    padding: 12px;
+}
+
+td.disabled {
+    opacity: 0;
+}
+
+td.past {
+    opacity: 0.3;
+}
+
+td.today {
+    font-weight: bold;
+    background-color: #0F71BC;
+    border-radius: 50%;
+    color: #FFFFFF;
+}
+
+#prev,
+#next,
+#today {
+    cursor: pointer;
+    user-select: none;
+}
+
+#prev {
+    color: #316c9f;
+    font-size: 26px;
+}
+
+#next {
+    color: #A7bdce;
+    font-size: 26px;
+}
+
+
+/* ----------モーダルの左側----------------------------- */
+
+@media (min-width: 768px) {
+    .modal-log-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.day-textbox {
+    position: relative;
+    display: block;
+    margin-top: 10px;
+    padding: 15px 0;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    color: black;
+    /* outline: none; */
+    background-color: #F5F5F8;
+    width: 90%;
+    height: 10px
+}
+
+.day-content-language {
+    height: auto;
+    width: auto;
+}
+
+.modal-language-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+}
+
+.modal-log-content {
+    margin-top: 10px;
+}
+
+.modal-content-list {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+}
+
+.log-title-twitter {
+    background-color: inherit;
+    ;
+}
+
+.content-list-flex {
+    display: flex;
+    gap: 8px;
+}
+
+
+/* モーダルの右側------------------------------------- */
+
+.time-twitter {
+    width: auto;
+}
+
+.time-textbox {
+    position: relative;
+    display: block;
+    margin-top: 10px;
+    padding: 15px 0;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    color: black;
+    /* outline: none;
+
+            */
+    background-color: #F5F5F8;
+    width: 90%;
+    height: 10px;
+}
+
+.twitter-textbox {
+    position: relative;
+    display: block;
+    margin-top: 10px;
+    padding: 15px 0;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    color: black;
+    /* outline: none; */
+    background-color: #F5F5F8;
+    height: 14em;
+}
+
+textarea {
+    resize: none;
+    background-color: #F5F5F8;
+    width: 90%;
+    padding: 15px;
+    margin-bottom: 5px;
+    height: 185px;
+    overflow-x: hidden;
+    height: 10vh;
+    border-radius: 15px;
+}
+
+
+/* モーダルの中の記録投稿ボタン */
+
+#opened-log-and-submit {
+    /* margin-right: 10px; */
+    padding: 12px;
+    background: linear-gradient(to right, #0f71DC, #3ccfff);
+    margin: 10px 35%;
+    border-radius: 50px;
+    max-width: 270px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 15px 10px 55px 0 rgba(60, 194, 235, 0.8);
+    color: #FFFFFF;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    margin: 0 auto;
+}
+
+
+/*-------------- ローディング--------------------*/
+
+.loding {
+    height: 350px;
+}
+
+#modal-otherthan-close.hide {
+    display: none;
+    width: auto;
+    overflow: hidden
+}
+
+#modal.one-screen {
+    margin-top: 0;
+    overflow-y: hidden;
+    text-align: center;
+    justify-content: center;
+    height: 550px;
+}
+
+#modal.one-screen2 {
+    margin-top: 0;
+    overflow-y: hidden;
+    /* text-align: center; */
+    justify-content: center;
+    height: 550px;
+}
+
+@media screen and (max-width: 768px) {
+    #modal.one-screen {
+        margin-top: 20em;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    #modal.one-screen2 {
+        margin-top: 10em;
+    }
+}
+
+#modal::-webkit-scrollbar {
+    display: none;
+}
+
+.loader {
+    font-size: 10px;
+    margin: 150px auto 50px;
+    text-indent: -9999em;
+    width: 11em;
+    height: 11em;
+    border-radius: 50%;
+    background: #ffffff;
+    background: -moz-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+    background: -webkit-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+    background: -o-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+    background: -ms-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+    background: linear-gradient(to right, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+    position: relative;
+    -webkit-animation: load3 1.4s infinite linear;
+    animation: load3 1.4s infinite linear;
+    -webkit-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    transform: translateZ(0);
+}
+
+.loader:before {
+    width: 50%;
+    height: 50%;
+    background: linear-gradient(to right, #0f71DC, #3ccfff);
+    border-radius: 100% 0 0 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: '';
+}
+
+.loader:after {
+    background: #FFFFFF;
+    width: 75%;
+    height: 75%;
+    border-radius: 50%;
+    content: '';
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+@-webkit-keyframes load3 {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes load3 {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+#finish-finish {
+    display: none;
+    left: 0;
+    right: 0;
+    text-align: center;
+    margin: 0 auto;
+}
+
+#finish-finish.open {
+    display: block;
+    height: 350px;
+    padding-top: 150px;
+}
+
+#finish-finish2 {
+    display: none;
+    left: 0;
+    right: 0;
+    /* text-align: center; */
+    margin: 0 auto;
+}
+
+#finish-finish2.open2 {
+    display: block;
+    height: 350px;
+}
+
+@media (max-width: 768px) {
+    #finish-finish.open {
+        padding-top: 80px;
+    }
+}
+
+
+/* ローディングを三秒流した後の完了画面 */
+
+.check-mark {
+    color: white;
+    background-color: #BDE360;
+    transform: rotate(139deg) translateX(5px);
+    font-size: 34px;
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-weight: 400;
+}
+
+.record-title {
+    color: #BDE360;
+}
+
+.record-text {
+    margin-top: 20px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    display: block;
+    font-size: 18px;
+    line-height: 1.8
+}
+
+
+/* レスポンシブ */
+
+@media (max-width:768px) {
+    #open {
+        display: none;
+    }
+    #open2 {
+        display: block;
+    }
+    .menu {
+        padding-top: 18px;
+    }
+    .modal-log-list {
+        padding: 0;
+    }
+}
+
+@media (min-width:768px) {
+    .graphs {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
