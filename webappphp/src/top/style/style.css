@@ -5,6 +5,7 @@ body {
     width: 100%;
     background-color: #F5F5F8;
     user-select: none;
+    /* overflow-x: hidden; */
 }
 
 body.overflow-hidden {

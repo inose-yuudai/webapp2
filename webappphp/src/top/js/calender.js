@@ -9,7 +9,7 @@ const hide = document.getElementById("modal-otherthan-close")
 const close = document.getElementById('close');
 const modal = document.getElementById('modal');
 const mask = document.getElementById('mask');
-const calender__open = document.getElementById("date")
+const calender__open = document.getElementById("selectedDate")
 const calender__display = document.getElementById("calendar")
 const back = document.getElementById("back")
 const decide = document.getElementById("decide");
@@ -173,7 +173,7 @@ document.getElementById('opened-log-and-submit').onclick = function() {
                 td.addEventListener("click", () => {
                     const gettitle = document.getElementById("title");
                     const getday = gettitle.innerHTML + td.innerHTML + "日";
-                    const day_display = document.getElementById("date")
+                    const day_display = document.getElementById("selectedDate")
                     day_display.value = getday
                     td.classList.toggle('aaaaa');
                         // テキストボックスの場合はinnerhtmlじゃなくて.value

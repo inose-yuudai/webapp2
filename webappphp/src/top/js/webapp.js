@@ -46,7 +46,7 @@
     const body = document.getElementById("bodybody");
     load.addEventListener("click", () => {
         if (Tweet.checked) {
-            openTwitter() //openTwitterを呼び出す 87行目
+            openTwitter() //openTwitterを呼び出す 78行目
         }
         hide.classList.add("hide");
         // バツ印以外をけす
@@ -91,6 +91,40 @@ rangeElements.forEach((element, index) => {
   element.innerHTML = content[index];
 });
 
+
+const date = document.querySelector('.day-textbox').value;
+const selectedDate = document.getElementById("selectedDate").value;
+const contents = [];
+document.querySelectorAll('input[name="content"]:checked').forEach((checkbox) => {
+    contents.push(checkbox.value);
+});
+const languages = [];
+document.querySelectorAll('input[name="language"]:checked').forEach((checkbox) => {
+    languages.push(checkbox.value);
+});
+const time = document.querySelector('.time-textbox').value;
+const twitter = document.querySelector('.js-twitter').checked;
+const tweet = document.querySelector('.twitter-textbox').value;
+
+
+$.ajax({
+    type: 'POST',
+    url: '/insert_data.php',
+    data: {
+        date:  selectedDate,
+        contents: contents,
+        languages: languages,
+        time: time,
+        twitter: twitter,
+        tweet: tweet
+    },
+    success: function(data) {
+        // データが正常に挿入された場合の処理
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+        // エラーが発生した場合の処理
+    }
+});
 
 
 

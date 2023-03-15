@@ -1,4 +1,4 @@
--- これを順番に mysql> に入れ込む　一個ずつ
+-- これを順番に mysql> に入れ込む 一個ずつ
 CREATE DATABASE IF NOT EXISTS webapp;
 USE webapp;
 
@@ -14,6 +14,8 @@ CREATE TABLE webapp_language (
     id INT(11) AUTO_INCREMENT PRIMARY KEY COMMENT 'ID',
     language_id INT COMMENT '言語ID',
     hours_id INT COMMENT '学習時間ID',
+    -- 雄真はここrecord_id
+    -- record_idはなんかはなんか
     FOREIGN KEY (`hours_id`) REFERENCES webapp_hours(`id`),
     FOREIGN KEY (`language_id`) REFERENCES languages(`id`)
 );
@@ -28,8 +30,8 @@ CREATE TABLE webapp_content (
     id INT(11) AUTO_INCREMENT PRIMARY KEY COMMENT 'ID',
     content_id INT COMMENT '学習コンテンツID',
     hours_id INT COMMENT '学習時間ID',
-    FOREIGN KEY (`content_id`) REFERENCES contents(`id`)
-    FOREIGN KEY (`hours_id`) REFERENCES webapp_hours(`id`),
+    FOREIGN KEY (`content_id`) REFERENCES contents(`id`),
+    FOREIGN KEY (`hours_id`) REFERENCES webapp_hours(`id`)
 );
 
 CREATE TABLE contents (
@@ -80,7 +82,7 @@ INSERT INTO `languages` VALUES
 (5, 'Laravel','#B29EF3'),
 (6, 'SQL','#6C46EB'),
 (7, 'SHELL','#4A17EF'),
-(8, '情報システム基礎知識(その他)','#3005C0')
+(8, '情報システム基礎知識(その他)','#3005C0');
 
 INSERT INTO `contents` VALUES
 (1, 'N予備校','#0445EC'),

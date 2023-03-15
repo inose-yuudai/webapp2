@@ -39,6 +39,9 @@ $stmt = $dbh->query($month_hours_sql);
 $this_hours = $stmt->fetchAll(PDO::FETCH_COLUMN);
 $month_total = array_sum($this_hours);
 
+
+
+
 // すべての日付分の時間を取得
 $all_hours_sql = "SELECT hours FROM webapp_hours";
 $stmt = $dbh->query($all_hours_sql);
@@ -49,10 +52,6 @@ $all_total = array_sum($this_hours);
 //! ***********************************************
 //! 学習時間計算終わり このデータは下でも使う
 //! ***********************************************
-
-
-
-
 
 // ***********************************************
 //  棒グラフ
@@ -77,7 +76,7 @@ class Study
     }
 }
 $month = date('n');  //date('n')で今月の月を数値として取得
-$sql = "SELECT DATE_FORMAT(webapp_hours.date, '%d') as day, sum(webapp_hours.hours) as hours FROM webapp_hours WHERE YEAR(webapp_hours.date) = YEAR(CURRENT_DATE()) AND MONTH(webapp_hours.date) = $month GROUP BY day";
+$sql = "SELECT DATE_FORMAT(webapp_hours.date, '%d') as day, sum(webapp_hours.hours) as hours FROM webapp_hours WHERE YEAR(webapp_hours.date) = YEAR(CURRENT_DATE()) AND MONTH(webapp_hours.date) = $month-1 GROUP BY day";
 $studies = $dbh->query($sql)->fetchAll(\PDO::FETCH_CLASS, Study::class);
 $formatted_study_data = array_map(function ($study) {
     return [$study->get_day(), $study->get_hours()];
@@ -107,19 +106,19 @@ $stmt = $dbh->query("SELECT * FROM languages");
 $languages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
-$stmt = $dbh->prepare("
-    SELECT languages.language, SUM(webapp_hours.hours) AS total_hours, color
-    FROM webapp_language
-    INNER JOIN webapp_hours ON webapp_language.hours_id = webapp_hours.id
-    INNER JOIN languages ON webapp_language.language_id = languages.id
-    GROUP BY languages.id
-");
-// SELECT テーブル名.カラム名, ... FROM テーブル名1
-//   INNER JOIN テーブル名2
-//   ON テーブル名1.カラム名1 = テーブル名2.カラム名2;
+
+
+$stmt = $dbh->prepare("SELECT languages.language as name ,ROUND(sum(webapp_hours.hours/hours_count), 1) hours, languages.color
+FROM webapp_language AS origin1
+INNER JOIN languages ON origin1.language_id = languages.id
+LEFT OUTER JOIN (SELECT origin2.hours_id, COUNT(hours_id) AS hours_count FROM webapp_language AS origin2 GROUP BY hours_id) AS origin2 ON origin2.hours_id = origin1.hours_id
+LEFT OUTER JOIN webapp_hours ON webapp_hours.id = origin1.hours_id
+GROUP BY origin1.language_id");
 $stmt->execute();
 $languages_hours = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// ROUND関数 : 小数点第何点かで切り捨て。今回は一を指定しているので小数点第一位以下で切り捨て  languages.language as name ,ROUND(sum(webapp_hours.hours/hours_count), 1) hours, languages.color
+// FROM webapp_languageをorigin1として,languagesテーブルと、origin1の、language_id = languagesのidが等しいところをくっつける
 
 
 
@@ -134,73 +133,54 @@ $languages_hours = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // *  学習コンテンツグラフ
 // ***********************************************
 
-
-
-$stmt = $dbh->query("SELECT * FROM contents");
-$languages = $stmt->fetchAll(PDO::FETCH_ASSOC);
-$stmt = $dbh->prepare("
-SELECT contents.content, SUM(webapp_content.hours_id/webapp_content_count.count) AS total_content_hours, contents.color
-FROM webapp_content
-INNER JOIN contents ON webapp_content.content_id = contents.id
-INNER JOIN (
-SELECT hours_id, COUNT(DISTINCT content_id) AS count
-FROM webapp_content
-GROUP BY hours_id
-) AS webapp_content_count ON webapp_content.hours_id = webapp_content_count.hours_id
-GROUP BY contents.id
-");
+$stmt = $dbh->prepare("SELECT contents.content as content ,ROUND(sum(webapp_hours.hours/hours_count), 1) hours, contents.color
+FROM webapp_content AS origin1
+INNER JOIN contents ON origin1.content_id = contents.id
+LEFT OUTER JOIN webapp_hours ON webapp_hours.id = origin1.hours_id
+LEFT OUTER JOIN (SELECT origin2.hours_id, COUNT(hours_id) AS hours_count FROM webapp_content AS origin2 GROUP BY hours_id) AS origin2 ON origin2.hours_id = origin1.hours_id
+GROUP BY origin1.content_id");
 $stmt->execute();
 $contents_hours = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// [ 'content' => 'HTML', 'total_content_hours' => 1.5, 'color' => '#4E79A7' ],
-$content_hour_sums = [];
-// $content_hour_sumsの中身:
-// [
-// 'HTML' => 1.5,
-// 'CSS' => 1.5,
-// 'PHP' => 1,
-// 'Laravel' => 0.5,
-// 'SQL' => 0.5,
-// ]
-foreach ($contents_hours as $item) {
-    $content_hour_sums[$item['content']] = $item['total_content_hours'];
-}
-
-$num_content_ids = $stmt->rowCount();  //$contents_hoursの行数を取得
-$total_hours = array_sum($content_hour_sums); //配列ないの数値の全ての合計を取得
-$average_hours = $total_hours / count($contents_hours);
-
-
-//! ***********************************************
-//! *  ここわからん
-//! ***********************************************
-
-
-$adjusted_contents_hours = array_map(function ($item) use ($content_hour_sums, $num_content_ids, $average_hours) {
-    $content_hours = $content_hour_sums[$item['content']] / $num_content_ids;
-    return [
-        'content' => $item['content'],
-        'total_content_hours' => $content_hours / $average_hours,
-        'color' => $item['color'],
-    ];
-}, $contents_hours);
-
-
-//! ***********************************************
-//! *  ここわからん 終わり
-//! ***********************************************
-
-// array_map()関数を使用して、各コンテンツの時間を、平均時間で割ったものを計算し、$adjusted_contents_hours配列に格納しています。$content_hour_sums配列から各コンテンツの時間を取得するために、useキーワードを使用して、$content_hour_sums変数をクロージャー内で利用するように指定します。また、コンテンツの色情報も配列に含めています。最終的に、$adjusted_contents_hours配列には、各コンテンツの名前、時間、色情報が含まれています。
-
-$series_content_data = json_encode(array_column($adjusted_contents_hours, 'total_content_hours'));
-$labels = json_encode(array_column($adjusted_contents_hours, 'content'));
-$colors = json_encode(array_column($adjusted_contents_hours, 'color'));
 
 
 
 // ***********************************************
 // *  学習コンテンツグラフ 終わり
 // ***********************************************
+
+
+
+
+
+// // データを挿入する
+// $date = $_POST['date'];
+// $time = $_POST['time'];
+
+// // webapp_hoursテーブルに挿入
+// $sql = 'INSERT INTO webapp_hours (date, hours) VALUES (:date, :hours)';
+// $stmt = $dbh->prepare($sql);
+// $stmt->bindValue(':date', $date, PDO::PARAM_STR);
+// $stmt->bindValue(':hours', $time, PDO::PARAM_INT);
+// $stmt->execute();
+// $hours_id = $dbh->lastInsertId(); // 挿入したレコードのIDを取得
+
+// // webapp_languageテーブルに挿入
+// foreach ($_POST['languages'] as $language) {
+//     $sql = 'INSERT INTO webapp_language (language_id, hours_id) VALUES (:language_id, :hours_id)';
+//     $stmt = $pdo->prepare($sql);
+//     $stmt->bindValue(':language_id', $language, PDO::PARAM_INT);
+//     $stmt->bindValue(':hours_id', $hours_id, PDO::PARAM_INT);
+//     $stmt->execute();
+// }
+
+// // webapp_contentテーブルに挿入
+// foreach ($_POST['contents'] as $content) {
+//     $sql = 'INSERT INTO webapp_content (content_id, hours_id) VALUES (:content_id, :hours_id)';
+//     $stmt = $pdo->prepare($sql);
+//     $stmt->bindValue(':content_id', $content, PDO::PARAM_INT);
+//     $stmt->bindValue(':hours_id', $hours_id, PDO::PARAM_INT);
+//     $stmt->execute();
+// }
 
 ?>
 <!DOCTYPE html>
@@ -211,14 +191,16 @@ $colors = json_encode(array_column($adjusted_contents_hours, 'color'));
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../top/style/normalize.css">
     <link rel="stylesheet" href="../top/style/style.css">
-    <script src="https://unpkg.com/apexcharts/dist/apexcharts.min.js"></script>
     <script src="../top/js/webapp.js" defer></script>
     <script src="../top/js/calender.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" defer></script>
+    <script src="https://unpkg.com/apexcharts/dist/apexcharts.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr "></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js" defer></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js " integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin=" anonymous "></script>
     <title>ウェーブアップ</title>
+    <!-- https://penpen-dev.com/blog/script-async-defer/ -->
+    <!-- deferとasyncのやつ めっちゃわかりやすい -->
 </head>
 
 <body id="bodybody">
@@ -240,31 +222,31 @@ $colors = json_encode(array_column($adjusted_contents_hours, 'color'));
                         ×
                     </div>
                     <div id="loading"></div>
-                    <div id="modal-otherthan-close">
+                    <form id="modal-otherthan-close" method="POST" enctype="multipart/form-data">
                         <div class="modal-log-list">
                             <div class="day-content-language">
                                 <div class="modal-log-day">
                                     <p>学習日</p>
-                                    <input class="day-textbox" id="date">
+                                    <input class="day-textbox" id="selectedDate" name="date">
                                 </div>
                                 <div class="modal-log-content">
                                     <p class="log-title">学習コンテンツ（複数選択可）</p>
                                     <div class="modal-content-list">
                                         <script>
-                                            const contents = ['N予備校', 'ドットインストール', 'POSSE課題'];
-                                            contents.forEach((content) => {
-                                                const id = `check-${content.replace(/[^a-zA-Z0-9]/g, '')}`;
-                                                const label = content === 'N予備校' ? 'nyobi' :
-                                                    content === 'ドットインストール' ? 'dot' :
-                                                    content === 'POSSE課題' ? 'kadai' :
-                                                    content.toLowerCase();
-                                                document.write(`
-                                                        <input type="checkbox" id="${id}" class="input-checkbox" name="content" value="${label}">
-                                                        <label for="${id}" class="checkbox">
-                                                        <div class="checkmark-true"></div>${content}
-                                                        </label>
-                                                    `);
-                                            });
+                                        const contents = ['N予備校', 'ドットインストール', 'POSSE課題'];
+                                        contents.forEach((content) => {
+                                            const id = `content-${content.replace(/[^a-zA-Z0-9]/g, '')}`; // 'content-'を接頭辞に追加
+                                            const label = content === 'N予備校' ? 'nyobi' :
+                                                content === 'ドットインストール' ? 'dot' :
+                                                content === 'POSSE課題' ? 'kadai' :
+                                                content.toLowerCase();
+                                            document.write(`
+                                                <input type="checkbox" id="${id}" class="input-checkbox" name="content" value="${label}">
+                                                <label for="${id}" class="checkbox">
+                                                    <div class="checkmark-true"></div>${content}
+                                                </label>
+                                            `);
+                                        });
                                         </script>
                                     </div>
                                 </div>
@@ -272,17 +254,16 @@ $colors = json_encode(array_column($adjusted_contents_hours, 'color'));
                                     <p class="log-title">学習言語（複数選択可）</p>
                                     <div class="modal-language-list">
                                         <script>
-                                            const languages = ['HTML', 'CSS', 'JavaScript', 'PHP', 'Laravel', 'SQL', 'SHELL', '情報システム基礎知識（その他）'];
+                                           const languages = ['HTML', 'CSS', 'JavaScript', 'PHP', 'Laravel', 'SQL', 'SHELL', '情報システム基礎知識（その他）'];
                                             languages.forEach((language) => {
-                                                const id = `check-${language.replace(/[^a-zA-Z0-9]/g, '')}`;
+                                                const id = `lang-${language.replace(/[^a-zA-Z0-9]/g, '')}`; // 'lang-'を接頭辞に追加
                                                 const label = language === '情報システム基礎知識（その他）' ? 'other' : language.toLowerCase();
-                                                // language.toLowerCase入力されたものを小文字にする
                                                 document.write(`
-                                                        <input type="checkbox" id="${id}" class="input-checkbox" name="language" value="${label}">
-                                                        <label for="${id}" class="checkbox">
+                                                    <input type="checkbox" id="${id}" class="input-checkbox" name="language" value="${label}">
+                                                    <label for="${id}" class="checkbox">
                                                         <div class="checkmark-true"></div>${language}
-                                                        </label>
-                                                    `);
+                                                    </label>
+                                                `);
                                             });
                                         </script>
                                     </div>
@@ -305,7 +286,7 @@ $colors = json_encode(array_column($adjusted_contents_hours, 'color'));
                         <div class="header-log" id="opened-log-and-submit" onclick="showLoad()">
                             記録・投稿
                         </div>
-                    </div>
+                    </form>
                     <article class="finish-sign" id="finish-finish">
                         <span class="record-title">AWESOME!</span>
                         <div class="check-mark-containor">
@@ -453,8 +434,6 @@ $colors = json_encode(array_column($adjusted_contents_hours, 'color'));
                     }
                 },
             },
-
-
             grid: {
                 yaxis: {
                     lines: {
@@ -462,7 +441,6 @@ $colors = json_encode(array_column($adjusted_contents_hours, 'color'));
                     },
                 },
             },
-
             yaxis: {
                 labels: {
                     formatter: function(value) {
@@ -514,7 +492,7 @@ $colors = json_encode(array_column($adjusted_contents_hours, 'color'));
 
 
 
-        let seriesData = <?php echo json_encode(array_column($languages_hours, 'total_hours')); ?>;
+        let seriesData = <?php echo json_encode(array_column($languages_hours, 'hours')); ?>;
 
         let convertedSeriesData = seriesData.map(function(item) {
             return parseFloat(item);
@@ -526,6 +504,7 @@ $colors = json_encode(array_column($adjusted_contents_hours, 'color'));
                 height: 400,
                 type: 'donut',
             },
+
 
             plotOptions: {
                 pie: {
@@ -545,7 +524,7 @@ $colors = json_encode(array_column($adjusted_contents_hours, 'color'));
             stroke: {
                 width: 0 //グラフ間の隙間の大きさ ０なら開けない
             },
-            labels: <?php echo json_encode(array_column($languages_hours, 'language')); ?>,
+            labels: <?php echo json_encode(array_column($languages_hours, 'name')); ?>,
             colors: <?php echo json_encode(array_column($languages_hours, 'color')); ?>,
 
             dataLabels: {
@@ -575,6 +554,7 @@ $colors = json_encode(array_column($adjusted_contents_hours, 'color'));
         let chart2 = new ApexCharts(document.getElementById("circle-charts1"), options2);
         chart2.render();
 
+
         //***********************************************
         //*  学習言語グラフjs 終わり
         // **********************************************
@@ -591,7 +571,7 @@ $colors = json_encode(array_column($adjusted_contents_hours, 'color'));
 
 
 
-        let series_content_Data = <?php echo json_encode(array_column($contents_hours, 'total_content_hours')); ?>;
+        let series_content_Data = <?php echo json_encode(array_column($contents_hours, 'hours')); ?>;
 
         let convertedSeriesData2 = series_content_Data.map(function(item) {
             return parseFloat(item);
@@ -618,8 +598,6 @@ $colors = json_encode(array_column($adjusted_contents_hours, 'color'));
                     }
                 }
             },
-            labels: <?php echo $labels; ?>,
-            colors: <?php echo $colors; ?>,
             dataLabels: {
                 style: {
                     fontSize: '0.75rem',
@@ -633,6 +611,8 @@ $colors = json_encode(array_column($adjusted_contents_hours, 'color'));
             stroke: {
                 width: 0,
             },
+            labels: <?php echo json_encode(array_column($contents_hours, 'name')); ?>,
+            colors: <?php echo json_encode(array_column($contents_hours, 'color')); ?>,
             responsive: [{
                 breakpoint: 768,
                 options: {
